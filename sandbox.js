@@ -1,14 +1,25 @@
-let users = [
-  { name: "Иван", age: 20, surname: "Иванов" },
-  { name: "Пётр", age: 18, surname: "Петров" },
-  { name: "Анна", age: 19, surname: "Каренина" },
-];
+// function sum(num1) {
+//   return function (num2) {
+//     return num1 + num2;
+//   };
+// }
 
-function byField(category) {
-  return function (a, b) {
-    return a[category] > b[category];
-  };
+// let sum = function sum(num1) {
+//   return num1 + sum(num2);
+// };
+
+function sum(num1) {
+  function innerSum(num2) {
+    return num1 + num2;
+  }
+
+  return innerSum;
+
+  // if (num1) {
+  //   return num1 + sum(num2);
+  // } else {
+  //   return;
+  // }
 }
 
-console.log(users.sort(byField("name")));
-console.log(users.sort(byField("age")));
+console.log(sum(5)(1));
