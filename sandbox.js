@@ -1,25 +1,42 @@
-function work(a, b) {
-  console.log(a + b);
+function f(a) {
+  console.log(a);
 }
 
-function spy(func) {
-  // let cache = new Map();
-  return function () {
-    let key = hash(arguments);
-    func.calls = hash(arguments);
-    return func.calls;
-  };
+function throttle(func, ms) {
+  let isThrottled = false,
+    savedArgs,
+    savedThis;
+
+  function wrapper() {
+    if (isThrottled) {
+      // (2)
+      savedArgs = arguments;
+      savedThis = this;
+      return;
+    }
+
+    func.apply(this, arguments); // (1)
+
+    isThrottled = true;
+
+    setTimeout(function () {
+      isThrottled = false; // (3)
+      if (savedArgs) {
+        wrapper.apply(savedThis, savedArgs);
+        savedArgs = savedThis = null;
+      }
+    }, ms);
+  }
+
+  return wrapper;
 }
 
-function hash(args) {
-  return args[0] + ", " + args[1];
-}
+// f1000 передаёт вызовы f максимум раз в 1000 мс
+let f1000 = throttle(f, 1000);
 
-work = spy(work);
+f1000(1); // показывает 1
+f1000(2); // (ограничение, 1000 мс ещё нет)
+f1000(3); // (ограничение, 1000 мс ещё нет)
 
-console.log(work(1, 2)); // 3
-console.log(work(4, 5)); // 9
-
-for (let args of work.calls) {
-  alert("call:" + args.join()); // "call:1,2", "call:4,5"
-}
+// когда 1000 мс истекли ...
+// ...выводим 3, промежуточное значение 2 было проигнорировано
